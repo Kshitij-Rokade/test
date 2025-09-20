@@ -2,15 +2,804 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Book Borrowing System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .book-card.borrowed {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+        }
+
+        .book-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .book-details {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .book-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-borrowed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            background: white;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .member-list, .borrowed-list {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .member-item, .borrowed-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .member-item:hover, .borrowed-item:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .member-item:last-child, .borrowed-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque dignissimos animi excepturi. Voluptate sed eius veritatis nostrum incidunt, quam unde facere. Officiis esse praesentium incidunt dignissimos illum sit alias consequatur?
-        Ab officiis quod explicabo facilis hic possimus, quas quo amet earum deserunt dolor qui iste distinctio commodi error enim consequuntur aliquid totam in! Magni voluptatibus qui impedit quis, nulla maxime!
-        Facilis sequi corporis consectetur nihil rem, optio ipsum aspernatur consequatur voluptatem fugit culpa aperiam delectus beatae est eius quod neque a quam iusto harum illo enim reprehenderit commodi. Incidunt, quam?
+    <div class="container">
+        <div class="header">
+            <h1>📚 Library Management System</h1>
+            <p>Manage your books, members, and borrowing records efficiently</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBooks">0</div>
+                <div class="stat-label">Total Books</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="availableBooks">0</div>
+                <div class="stat-label">Available Books</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="borrowedBooks">0</div>
+                <div class="stat-label">Borrowed Books</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalMembers">0</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('books')">📖 Books</button>
+            <button class="tab" onclick="showTab('members')">👥 Members</button>
+            <button class="tab" onclick="showTab('borrow')">🔄 Borrow/Return</button>
+            <button class="tab" onclick="showTab('records')">📋 Records</button>
+        </div>
+
+        <div id="books" class="tab-content active">
+            <h2>Book Management</h2>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-top: 20px;">
+                <div>
+                    <h3>Add New Book</h3>
+                    <form id="addBookForm">
+                        <div class="form-group">
+                            <label>Book Title</label>
+                            <input type="text" id="bookTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Author</label>
+                            <input type="text" id="bookAuthor" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ISBN</label>
+                            <input type="text" id="bookISBN" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="bookCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Science">Science</option>
+                                <option value="History">History</option>
+                                <option value="Biography">Biography</option>
+                                <option value="Technology">Technology</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Add Book</button>
+                    </form>
+                </div>
+                <div>
+                    <h3>Book Collection</h3>
+                    <input type="text" class="search-box" id="bookSearch" placeholder="Search books by title, author, or ISBN...">
+                    <div class="books-grid" id="booksContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="members" class="tab-content">
+            <h2>Member Management</h2>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-top: 20px;">
+                <div>
+                    <h3>Add New Member</h3>
+                    <form id="addMemberForm">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="memberName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="memberEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="memberPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Member Type</label>
+                            <select id="memberType" required>
+                                <option value="">Select Type</option>
+                                <option value="Student">Student</option>
+                                <option value="Faculty">Faculty</option>
+                                <option value="Public">Public</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Add Member</button>
+                    </form>
+                </div>
+                <div>
+                    <h3>Member List</h3>
+                    <input type="text" class="search-box" id="memberSearch" placeholder="Search members...">
+                    <div class="member-list" id="membersContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="borrow" class="tab-content">
+            <h2>Borrow & Return Books</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                <div>
+                    <h3>Borrow Book</h3>
+                    <form id="borrowForm">
+                        <div class="form-group">
+                            <label>Select Member</label>
+                            <select id="borrowMember" required>
+                                <option value="">Choose Member</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Select Book</label>
+                            <select id="borrowBook" required>
+                                <option value="">Choose Book</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="date" id="dueDate" required>
+                        </div>
+                        <button type="submit" class="btn">Borrow Book</button>
+                    </form>
+                </div>
+                <div>
+                    <h3>Return Book</h3>
+                    <form id="returnForm">
+                        <div class="form-group">
+                            <label>Select Borrowed Book</label>
+                            <select id="returnBook" required>
+                                <option value="">Choose Borrowed Book</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Return Book</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="records" class="tab-content">
+            <h2>Borrowing Records</h2>
+            <input type="text" class="search-box" id="recordSearch" placeholder="Search records...">
+            <div class="borrowed-list" id="recordsContainer"></div>
+        </div>
     </div>
-    <h1>Hello World</h1>
-</body>
-</html>
+
+    <script>
+        // Library Management System JavaScript
+        class LibrarySystem {
+            constructor() {
+                this.books = JSON.parse(localStorage.getItem('libraryBooks')) || [];
+                this.members = JSON.parse(localStorage.getItem('libraryMembers')) || [];
+                this.borrowRecords = JSON.parse(localStorage.getItem('libraryRecords')) || [];
+                this.nextBookId = parseInt(localStorage.getItem('nextBookId')) || 1;
+                this.nextMemberId = parseInt(localStorage.getItem('nextMemberId')) || 1;
+                this.nextRecordId = parseInt(localStorage.getItem('nextRecordId')) || 1;
+                
+                this.initializeEventListeners();
+                this.loadSampleData();
+                this.updateStats();
+                this.renderBooks();
+                this.renderMembers();
+                this.updateDropdowns();
+                this.renderRecords();
+            }
+
+            loadSampleData() {
+                if (this.books.length === 0) {
+                    const sampleBooks = [
+                        { id: 1, title: "The Great Gatsby", author: "F. Scott Fitzgerald", isbn: "978-0-7432-7356-5", category: "Fiction", available: true },
+                        { id: 2, title: "To Kill a Mockingbird", author: "Harper Lee", isbn: "978-0-06-112008-4", category: "Fiction", available: true },
+                        { id: 3, title: "1984", author: "George Orwell", isbn: "978-0-452-28423-4", category: "Fiction", available: true },
+                        { id: 4, title: "JavaScript: The Good Parts", author: "Douglas Crockford", isbn: "978-0-596-51774-8", category: "Technology", available: true },
+                        { id: 5, title: "Clean Code", author: "Robert C. Martin", isbn: "978-0-13-235088-4", category: "Technology", available: true }
+                    ];
+                    this.books = sampleBooks;
+                    this.nextBookId = 6;
+                    this.saveData();
+                }
+
+                if (this.members.length === 0) {
+                    const sampleMembers = [
+                        { id: 1, name: "John Doe", email: "john@example.com", phone: "123-456-7890", type: "Student", joinDate: new Date().toISOString().split('T')[0] },
+                        { id: 2, name: "Jane Smith", email: "jane@example.com", phone: "098-765-4321", type: "Faculty", joinDate: new Date().toISOString().split('T')[0] },
+                        { id: 3, name: "Bob Johnson", email: "bob@example.com", phone: "555-123-4567", type: "Public", joinDate: new Date().toISOString().split('T')[0] }
+                    ];
+                    this.members = sampleMembers;
+                    this.nextMemberId = 4;
+                    this.saveData();
+                }
+            }
+
+            initializeEventListeners() {
+                document.getElementById('addBookForm').addEventListener('submit', (e) => this.addBook(e));
+                document.getElementById('addMemberForm').addEventListener('submit', (e) => this.addMember(e));
+                document.getElementById('borrowForm').addEventListener('submit', (e) => this.borrowBook(e));
+                document.getElementById('returnForm').addEventListener('submit', (e) => this.returnBook(e));
+                
+                document.getElementById('bookSearch').addEventListener('input', (e) => this.searchBooks(e.target.value));
+                document.getElementById('memberSearch').addEventListener('input', (e) => this.searchMembers(e.target.value));
+                document.getElementById('recordSearch').addEventListener('input', (e) => this.searchRecords(e.target.value));
+                
+                // Set default due date to 2 weeks from today
+                const today = new Date();
+                const twoWeeks = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+                document.getElementById('dueDate').value = twoWeeks.toISOString().split('T')[0];
+            }
+
+            saveData() {
+                localStorage.setItem('libraryBooks', JSON.stringify(this.books));
+                localStorage.setItem('libraryMembers', JSON.stringify(this.members));
+                localStorage.setItem('libraryRecords', JSON.stringify(this.borrowRecords));
+                localStorage.setItem('nextBookId', this.nextBookId.toString());
+                localStorage.setItem('nextMemberId', this.nextMemberId.toString());
+                localStorage.setItem('nextRecordId', this.nextRecordId.toString());
+            }
+
+            showAlert(message, type = 'success') {
+                const alertContainer = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.textContent = message;
+                
+                alertContainer.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }
+
+            addBook(e) {
+                e.preventDefault();
+                const title = document.getElementById('bookTitle').value;
+                const author = document.getElementById('bookAuthor').value;
+                const isbn = document.getElementById('bookISBN').value;
+                const category = document.getElementById('bookCategory').value;
+                
+                // Check if ISBN already exists
+                if (this.books.some(book => book.isbn === isbn)) {
+                    this.showAlert('A book with this ISBN already exists!', 'error');
+                    return;
+                }
+                
+                const book = {
+                    id: this.nextBookId++,
+                    title,
+                    author,
+                    isbn,
+                    category,
+                    available: true,
+                    addedDate: new Date().toISOString().split('T')[0]
+                };
+                
+                this.books.push(book);
+                this.saveData();
+                this.renderBooks();
+                this.updateStats();
+                this.updateDropdowns();
+                
+                document.getElementById('addBookForm').reset();
+                this.showAlert(`Book "${title}" added successfully!`);
+            }
+
+            addMember(e) {
+                e.preventDefault();
+                const name = document.getElementById('memberName').value;
+                const email = document.getElementById('memberEmail').value;
+                const phone = document.getElementById('memberPhone').value;
+                const type = document.getElementById('memberType').value;
+                
+                // Check if email already exists
+                if (this.members.some(member => member.email === email)) {
+                    this.showAlert('A member with this email already exists!', 'error');
+                    return;
+                }
+                
+                const member = {
+                    id: this.nextMemberId++,
+                    name,
+                    email,
+                    phone,
+                    type,
+                    joinDate: new Date().toISOString().split('T')[0]
+                };
+                
+                this.members.push(member);
+                this.saveData();
+                this.renderMembers();
+                this.updateStats();
+                this.updateDropdowns();
+                
+                document.getElementById('addMemberForm').reset();
+                this.showAlert(`Member "${name}" added successfully!`);
+            }
+
+            borrowBook(e) {
+                e.preventDefault();
+                const memberId = parseInt(document.getElementById('borrowMember').value);
+                const bookId = parseInt(document.getElementById('borrowBook').value);
+                const dueDate = document.getElementById('dueDate').value;
+                
+                const book = this.books.find(b => b.id === bookId);
+                const member = this.members.find(m => m.id === memberId);
+                
+                if (!book.available) {
+                    this.showAlert('This book is already borrowed!', 'error');
+                    return;
+                }
+                
+                const record = {
+                    id: this.nextRecordId++,
+                    memberId,
+                    memberName: member.name,
+                    bookId,
+                    bookTitle: book.title,
+                    borrowDate: new Date().toISOString().split('T')[0],
+                    dueDate,
+                    returned: false
+                };
+                
+                book.available = false;
+                this.borrowRecords.push(record);
+                
+                this.saveData();
+                this.renderBooks();
+                this.renderRecords();
+                this.updateStats();
+                this.updateDropdowns();
+                
+                document.getElementById('borrowForm').reset();
+                this.showAlert(`Book "${book.title}" borrowed by ${member.name}!`);
+            }
+
+            returnBook(e) {
+                e.preventDefault();
+                const recordId = parseInt(document.getElementById('returnBook').value);
+                
+                const record = this.borrowRecords.find(r => r.id === recordId);
+                const book = this.books.find(b => b.id === record.bookId);
+                
+                record.returned = true;
+                record.returnDate = new Date().toISOString().split('T')[0];
+                book.available = true;
+                
+                this.saveData();
+                this.renderBooks();
+                this.renderRecords();
+                this.updateStats();
+                this.updateDropdowns();
+                
+                document.getElementById('returnForm').reset();
+                this.showAlert(`Book "${record.bookTitle}" returned successfully!`);
+            }
+
+            deleteBook(bookId) {
+                if (confirm('Are you sure you want to delete this book?')) {
+                    this.books = this.books.filter(book => book.id !== bookId);
+                    this.saveData();
+                    this.renderBooks();
+                    this.updateStats();
+                    this.updateDropdowns();
+                    this.showAlert('Book deleted successfully!');
+                }
+            }
+
+            deleteMember(memberId) {
+                const hasActiveLoans = this.borrowRecords.some(record => 
+                    record.memberId === memberId && !record.returned
+                );
+                
+                if (hasActiveLoans) {
+                    this.showAlert('Cannot delete member with active book loans!', 'error');
+                    return;
+                }
+                
+                if (confirm('Are you sure you want to delete this member?')) {
+                    this.members = this.members.filter(member => member.id !== memberId);
+                    this.saveData();
+                    this.renderMembers();
+                    this.updateStats();
+                    this.updateDropdowns();
+                    this.showAlert('Member deleted successfully!');
+                }
+            }
+
+            renderBooks(booksToRender = this.books) {
+                const container = document.getElementById('booksContainer');
+                container.innerHTML = '';
+                
+                booksToRender.forEach(book => {
+                    const bookCard = document.createElement('div');
+                    bookCard.className = `book-card ${!book.available ? 'borrowed' : ''}`;
+                    bookCard.innerHTML = `
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-details">
+                            <strong>Author:</strong> ${book.author}<br>
+                            <strong>ISBN:</strong> ${book.isbn}<br>
+                            <strong>Category:</strong> ${book.category}
+                        </div>
+                        <span class="book-status ${book.available ? 'status-available' : 'status-borrowed'}">
+                            ${book.available ? 'Available' : 'Borrowed'}
+                        </span>
+                        <div>
+                            <button class="btn btn-danger" onclick="library.deleteBook(${book.id})">Delete</button>
+                        </div>
+                    `;
+                    container.appendChild(bookCard);
+                });
+            }
+
+            renderMembers(membersToRender = this.members) {
+                const container = document.getElementById('membersContainer');
+                container.innerHTML = '';
+                
+                membersToRender.forEach(member => {
+                    const memberItem = document.createElement('div');
+                    memberItem.className = 'member-item';
+                    memberItem.innerHTML = `
+                        <div>
+                            <strong>${member.name}</strong><br>
+                            <small>${member.email} | ${member.phone} | ${member.type}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-danger" onclick="library.deleteMember(${member.id})">Delete</button>
+                        </div>
+                    `;
+                    container.appendChild(memberItem);
+                });
+            }
+
+            renderRecords(recordsToRender = this.borrowRecords) {
+                const container = document.getElementById('recordsContainer');
+                container.innerHTML = '';
+                
+                recordsToRender.sort((a, b) => new Date(b.borrowDate) - new Date(a.borrowDate));
+                
+                recordsToRender.forEach(record => {
+                    const recordItem = document.createElement('div');
+                    recordItem.className = 'borrowed-item';
+                    
+                    const isOverdue = !record.returned && new Date() > new Date(record.dueDate);
+                    const statusClass = record.returned ? 'status-available' : (isOverdue ? 'status-borrowed' : 'status-available');
+                    const statusText = record.returned ? 'Returned' : (isOverdue ? 'Overdue' : 'Active');
+                    
+                    recordItem.innerHTML = `
+                        <div>
+                            <strong>${record.bookTitle}</strong><br>
+                            <small>Borrowed by: ${record.memberName}</small><br>
+                            <small>Due: ${record.dueDate}</small>
+                            ${record.returned ? `<br><small>Returned: ${record.returnDate}</small>` : ''}
+                        </div>
+                        <div>
+                            <span class="book-status ${statusClass}">${statusText}</span>
+                        </div>
+                    `;
+                    container.appendChild(recordItem);
+                });
+            }
+
+            updateDropdowns() {
+                // Update member dropdown for borrowing
+                const borrowMemberSelect = document.getElementById('borrowMember');
+                borrowMemberSelect.innerHTML = '<option value="">Choose Member</option>';
+                this.members.forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member.id;
+                    option.textContent = `${member.name} (${member.type})`;
+                    borrowMemberSelect.appendChild(option);
+                });
+                
+                // Update book dropdown for borrowing (only available books)
+                const borrowBookSelect = document.getElementById('borrowBook');
+                borrowBookSelect.innerHTML = '<option value="">Choose Book</option>';
+                this.books.filter(book => book.available).forEach(book => {
+                    const option = document.createElement('option');
+                    option.value = book.id;
+                    option.textContent = `${book.title} by ${book.author}`;
+                    borrowBookSelect.appendChild(option);
+                });
+                
+                // Update return book dropdown (only borrowed books)
+                const returnBookSelect = document.getElementById('return
